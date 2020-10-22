@@ -3,6 +3,7 @@ clean2K()
 {
     kill -9 $(ps -ef | grep "lotus "|grep -v color|awk '{print $2}')
     kill -9 $(ps -ef | grep "lotus-miner"|grep -v color|awk '{print $2}')
+    redis-cli -n 2 flushdb
     ll $LOTUS_PATH_2K | awk 'BEGIN {print "Start clean 2k files"}{if($9 !~ /^v28/ && $9 != "./" && $9 != "../" && $9 != ""){system("rm -fr '$LOTUS_PATH_2K'/"$9)}}END {print "Clean 2k file end"}'
 }
 build2K()
