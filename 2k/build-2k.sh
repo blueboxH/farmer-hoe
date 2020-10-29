@@ -15,6 +15,8 @@ build2K()
 
     export LOTUS_REDIS_PATH=127.0.0.1:6379-2-t09190-15
 
+    export CURRENT_MINER_STORAGE_PATH=$CURRENT_MINER_STORAGE_PATH
+
     export FIL_PROOFS_PARAMETER_CACHE=/root/v28
 
     export TMPDIR=$LOTUS_PATH_2K
@@ -36,6 +38,12 @@ build2K()
         sed -i /TMPDIR=/d ~/.bashrc
     fi
     echo "export TMPDIR=$LOTUS_PATH_2K" >> ~/.bashrc
+
+    if [[ $(grep CURRENT_MINER_STORAGE_PATH ~/.bashrc |wc -l) > 0 ]]
+    then
+        sed -i /CURRENT_MINER_STORAGE_PATH=/d ~/.bashrc
+    fi
+    echo "export CURRENT_MINER_STORAGE_PATH=$CURRENT_MINER_STORAGE_PATH" >> ~/.bashrc
 
     make 2k &&
 
@@ -131,26 +139,32 @@ then
 fi
 if [ -z $4 ]
 then
-    echo -e "[\033[32mfarmer-hoe\033[0m] \033[31m找不到参数4:Worker节点上运行产生文件的位置，example:/filecoin_2k\033[0m"
+    echo -e "[\033[32mfarmer-hoe\033[0m] \033[31m找不到参数4:当前使用的Storage Path，example:/filecoin/lotusminer\033[0m"
     
 fi
 if [ -z $5 ]
 then
-    echo -e "[\033[32mfarmer-hoe\033[0m] \033[31m找不到参数5:Precommit Worker的节点，example:192.168.14.42,192.168.14.43\033[0m"
+    echo -e "[\033[32mfarmer-hoe\033[0m] \033[31m找不到参数5:Worker节点上运行产生文件的位置，example:/filecoin_2k\033[0m"
     
 fi
 if [ -z $6 ]
 then
+    echo -e "[\033[32mfarmer-hoe\033[0m] \033[31m找不到参数6:Precommit Worker的节点，example:192.168.14.42,192.168.14.43\033[0m"
+    
+fi
+if [ -z $7 ]
+then
     echo -e "[\033[32mfarmer-hoe\033[0m] \033[31m找不到参数6:Commit Worker的节点，example:192.168.14.63,192.168.14.64\033[0m"
 fi
-if [ $# -eq 6 ] 
+if [ $# -eq 7 ] 
 then
     LOTUS_SOURCE_2K=$1
     LOTUS_PATH_2K=$2
     LOTUS_PATH_WORKER_BIN=$3
-    LOTUS_PATH_WORKER_2K=$4
-    PrecommitHost=$5
-    CommitHost=$6
+    CURRENT_MINER_STORAGE_PATH=$4
+    LOTUS_PATH_WORKER_2K=$5
+    PrecommitHost=$6
+    CommitHost=$7
     localIp=$(ifconfig|grep 'inet 192.168'|awk '{print $2}')
     workerDir=$(pwd)
     cd $LOTUS_SOURCE_2K 
