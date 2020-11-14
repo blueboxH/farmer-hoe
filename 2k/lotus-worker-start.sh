@@ -9,9 +9,9 @@ kill -9 $(ps -ef | grep lotus-worker|grep -v color|grep ${LOTUS_PATH_WORKER_BIN}
 mkdir ${LOTUS_PATH_WORKER_BIN}
 mkdir ${LOTUS_PATH_WORKER_2K}
 rm -fr ${LOTUS_PATH_WORKER_2K}/worker.log
-rm -fr ${LOTUS_PATH_WORKER_2K}/sealed/*
-rm -fr ${LOTUS_PATH_WORKER_2K}/unsealed/*
-rm -fr ${LOTUS_PATH_WORKER_2K}/cache/*
+rm -fr ${LOTUS_PATH_WORKER_2K}/lotusworker/sealed/*
+rm -fr ${LOTUS_PATH_WORKER_2K}/lotusworker/unsealed/*
+rm -fr ${LOTUS_PATH_WORKER_2K}/lotusworker/cache/*
 scp root@LOTUSMINERHOSTPLACEHOLDER:${LOTUS_SOURCE_2K}/lotus-worker ${LOTUS_PATH_WORKER_BIN}/lotus-worker
 if [[ $taskType == Precommit ]]
 then
