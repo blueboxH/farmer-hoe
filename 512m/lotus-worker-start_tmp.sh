@@ -4,7 +4,7 @@ LOTUS_PATH_WORKER_BIN=/root/XDTest
 LOTUS_SOURCE_2K=/root/lotus-camod
 LOTUS_PATH_WORKER_2K=/filecoin
 export MINER_STORAGE_PATH=/nfs/lotusminer_public_2k
-export MINER_API_INFO=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBbGxvdyI6WyJyZWFkIiwid3JpdGUiLCJzaWduIiwiYWRtaW4iXX0.p7ng2Rw5bhd64fRFhoC-49ws8r-tZexB7AXASK7dMmw:/ip4/192.168.14.50/tcp/2345/http
+export MINER_API_INFO=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBbGxvdyI6WyJyZWFkIiwid3JpdGUiLCJzaWduIiwiYWRtaW4iXX0.GUHLN6jEN1-jOL1P49ojL9NTnABbX4eTgue6Ebb4LqQ:/ip4/127.0.0.1/tcp/2345/http
 kill -9 $(ps -ef | grep lotus-worker|grep -v color|grep ${LOTUS_PATH_WORKER_BIN} |awk '{print $2}')
 mkdir ${LOTUS_PATH_WORKER_BIN}
 mkdir ${LOTUS_PATH_WORKER_2K}

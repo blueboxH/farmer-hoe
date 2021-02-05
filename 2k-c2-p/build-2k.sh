@@ -4,10 +4,11 @@ clean2K()
     kill -9 $(ps -ef | grep "lotus "|grep -v color|awk '{print $2}')
     kill -9 $(ps -ef | grep "lotus-miner"|grep -v color|awk '{print $2}')
     redis-cli -n 2 flushdb
-    ll $LOTUS_PATH_2K | awk 'BEGIN {print "Start clean 512MiB files"}{if($9 !~ /^v28/ && $9 != "./" && $9 != "../" && $9 != ""){system("rm -fr '$LOTUS_PATH_2K'/"$9)}}END {print "Clean 2k file end"}'
+    ll $LOTUS_PATH_2K | awk 'BEGIN {print "Start clean 2k files"}{if($9 !~ /^v28/ && $9 != "./" && $9 != "../" && $9 != ""){system("rm -fr '$LOTUS_PATH_2K'/"$9)}}END {print "Clean 2k file end"}'
 }
 build2K()
 {
+
     export LOTUS_PATH=$LOTUS_PATH_2K/lotus
 
     export LOTUS_MINER_PATH=$LOTUS_PATH_2K/lotusminer
@@ -16,9 +17,7 @@ build2K()
 
     export CURRENT_MINER_STORAGE_PATH=$CURRENT_MINER_STORAGE_PATH
 
-    export FIL_PROOFS_PARAMETER_CACHE=/nfs/v28
-
-    export FULLNODE_API_INFO=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBbGxvdyI6WyJyZWFkIiwid3JpdGUiLCJzaWduIiwiYWRtaW4iXX0.3WWg-DgoaFca233ygnFkwlOZmFDS61yGbb34foyDfFk:/ip4/192.168.14.14/tcp/1234/http
+    export FIL_PROOFS_PARAMETER_CACHE=/root/v28
 
     export TMPDIR=$LOTUS_PATH_2K
 
@@ -46,40 +45,34 @@ build2K()
     fi
     echo "export CURRENT_MINER_STORAGE_PATH=$CURRENT_MINER_STORAGE_PATH" >> ~/.bashrc
 
-    if [[ $(grep FULLNODE_API_INFO ~/.bashrc |wc -l) > 0 ]]
-    then
-        sed -i /FULLNODE_API_INFO=/d ~/.bashrc
-    fi
-    echo "export FULLNODE_API_INFO=$FULLNODE_API_INFO" >> ~/.bashrc
+    export LOTUS_SKIP_GENESIS_CHECK=_yes_
 
-    # env RUSTFLAGS="-C target-cpu=native -g" FIL_PROOFS_USE_GPU_COLUMN_BUILDER=1 FIL_PROOFS_USE_GPU_TREE_BUILDER=1 FFI_BUILD_FROM_SOURCE=1 make clean all 
+    ./lotus-seed --sector-dir $LOTUS_PATH_2K/genesis-sectors pre-seal --sector-size 2KiB --num-sectors 2
 
-#    export LOTUS_SKIP_GENESIS_CHECK=_yes_
+    ./lotus-seed genesis new $LOTUS_PATH_2K/localnet.json
 
-#    ./lotus-seed --sector-dir $LOTUS_PATH_2K/genesis-sectors pre-seal --sector-size 2KiB --num-sectors 2
+    ./lotus-seed genesis add-miner $LOTUS_PATH_2K/localnet.json $LOTUS_PATH_2K/genesis-sectors/pre-seal-t01000.json
 
-#    ./lotus-seed genesis new $LOTUS_PATH_2K/localnet.json
+    nohup ./lotus daemon --lotus-make-genesis=$LOTUS_PATH_2K/dev.gen --genesis-template=$LOTUS_PATH_2K/localnet.json --bootstrap=false  >> $LOTUS_PATH_2K/daemon.log 2>&1 &
+    echo "等待同步节点启动中..."
+    ./lotus wait-api
+    ./lotus wallet import --as-default $LOTUS_PATH_2K/genesis-sectors/pre-seal-t01000.key
 
-#    ./lotus-seed genesis add-miner $LOTUS_PATH_2K/localnet.json $LOTUS_PATH_2K/genesis-sectors/pre-seal-t01000.json
+    while [[ $? != 0  ]]
+    do 
+        sleep 1s
+        ./lotus wallet import --as-default $LOTUS_PATH_2K/genesis-sectors/pre-seal-t01000.key
+    done
 
-#    nohup ./lotus daemon --lotus-make-genesis=$LOTUS_PATH_2K/dev.gen --genesis-template=$LOTUS_PATH_2K/localnet.json --bootstrap=false  >> $LOTUS_PATH_2K/daemon.log 2>&1 &
-
-#    ./lotus wallet import --as-default $LOTUS_PATH_2K/genesis-sectors/pre-seal-t01000.key
-
-#    while [[ $? != 0  ]]
-#    do 
-#        sleep 1s
-#        ./lotus wallet import --as-default $LOTUS_PATH_2K/genesis-sectors/pre-seal-t01000.key
-#    done
-
-    ./lotus-miner init --sector-size=512MiB --owner=$(./lotus wallet default)
-    #sed -i -e "/127.0.0.1/s/^#\s*//;s/127.0.0.1/${localIp}/" \
-    #    -e '/AllowPreCommit1/s/^#\s*//;/AllowPreCommit1/s/true/false/' \
-    #   -e '/AllowPreCommit2/s/^#\s*//;/AllowPreCommit2/s/true/false/' \
-     #  -e '/AllowCommit/s/^#\s*//;/AllowCommit/s/true/false/' \
-      # -e '/AllowUnseal/s/^#\s*//;/AllowUnseal/s/true/false/' ${LOTUS_PATH_2K}/lotusminer/config.toml 
-   nohup ./lotus-miner run >> $LOTUS_PATH_2K/miner.log 2>&1 &
-
+    ./lotus-miner init --genesis-miner --actor=t01000 --sector-size=2KiB --pre-sealed-sectors=$LOTUS_PATH_2K/genesis-sectors --pre-sealed-metadata=$LOTUS_PATH_2K/genesis-sectors/pre-seal-t01000.json --nosync
+    sed -i -e "/127.0.0.1/s/^#\s*//;s/127.0.0.1/${localIp}/" \
+        -e '/AllowPreCommit1/s/^#\s*//;/AllowPreCommit1/s/true/false/' \
+        -e '/AllowPreCommit2/s/^#\s*//;/AllowPreCommit2/s/true/false/' \
+        -e '/AllowCommit/s/^#\s*//;/AllowCommit/s/true/false/' \
+        -e '/AllowUnseal/s/^#\s*//;/AllowUnseal/s/true/false/' ${LOTUS_PATH_2K}/lotusminer/config.toml 
+    nohup ./lotus-miner run --nosync >> $LOTUS_PATH_2K/miner.log 2>&1 &
+    echo "等待 miner 启动中..."
+    ./lotus-miner wait-api
     ./lotus-miner log set-level --system storageminer error
 
     ./lotus-miner log set-level --system miner error
@@ -156,18 +149,14 @@ then
 fi
 if [ -z $6 ]
 then
-    echo -e "[\033[32mfarmer-hoe\033[0m] \033[31m找不到参数6:Precommit Worker的节点，example:192.168.14.42,192.168.14.43\033[0m"
+    echo -e "[\033[32mfarmer-hoe\033[0m] \033[31m找不到参数6:Precommit Worker的节点，example:25.10.10.72,25.10.10.71\033[0m"
     
 fi
 if [ -z $7 ]
 then
-    echo -e "[\033[32mfarmer-hoe\033[0m] \033[31m找不到参数6:Commit Worker的节点，example:192.168.14.63,192.168.14.64\033[0m"
+    echo -e "[\033[32mfarmer-hoe\033[0m] \033[31m找不到参数6:Commit Worker的节点，example:25.10.10.72,25.10.10.71\033[0m"
 fi
-if [ -z $8 ]
-then
-    echo -e "[\033[32mfarmer-hoe\033[0m] \033[31m找不到参数7:同步节点API_TOKEN，example:FULLNODE_API_INFO=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBbGxvdyI6WyJyZWFkIiwid3JpdGUiLCJzaWduIiwiYWRtaW4iXX0.AD-7Nd36yzVkx7w36nXTz2V3gjncWuiUKxxEedmOvpQ:/ip4/192.168.14.148/tcp/1234/http"
-fi
-if [ $# -eq 8 ] 
+if [ $# -eq 7 ] 
 then
     LOTUS_SOURCE_2K=$1
     LOTUS_PATH_2K=$2
@@ -176,7 +165,7 @@ then
     LOTUS_PATH_WORKER_2K=$5
     PrecommitHost=$6
     CommitHost=$7
-    localIp=$(ifconfig|grep 'inet 192.168'|awk '{print $2}')
+    localIp=$(ifconfig|grep 'inet 25.10'|awk '{print $2}')
     workerDir=$(pwd)
     cd $LOTUS_SOURCE_2K 
     clean2K

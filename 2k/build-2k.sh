@@ -56,7 +56,8 @@ build2K()
     ./lotus-seed genesis add-miner $LOTUS_PATH_2K/localnet.json $LOTUS_PATH_2K/genesis-sectors/pre-seal-t01000.json
 
     nohup ./lotus daemon --lotus-make-genesis=$LOTUS_PATH_2K/dev.gen --genesis-template=$LOTUS_PATH_2K/localnet.json --bootstrap=false  >> $LOTUS_PATH_2K/daemon.log 2>&1 &
-
+    echo "等待同步节点启动中..."
+    ./lotus wait-api
     ./lotus wallet import --as-default $LOTUS_PATH_2K/genesis-sectors/pre-seal-t01000.key
 
     while [[ $? != 0  ]]
@@ -72,7 +73,8 @@ build2K()
         -e '/AllowCommit/s/^#\s*//;/AllowCommit/s/true/false/' \
         -e '/AllowUnseal/s/^#\s*//;/AllowUnseal/s/true/false/' ${LOTUS_PATH_2K}/lotusminer/config.toml 
     nohup ./lotus-miner run --nosync >> $LOTUS_PATH_2K/miner.log 2>&1 &
-
+    echo "等待 miner 启动中..."
+    ./lotus-miner wait-api
     ./lotus-miner log set-level --system storageminer error
 
     ./lotus-miner log set-level --system miner error
@@ -149,12 +151,12 @@ then
 fi
 if [ -z $6 ]
 then
-    echo -e "[\033[32mfarmer-hoe\033[0m] \033[31m找不到参数6:Precommit Worker的节点，example:192.168.14.42,192.168.14.43\033[0m"
+    echo -e "[\033[32mfarmer-hoe\033[0m] \033[31m找不到参数6:Precommit Worker的节点，example:25.10.10.72,25.10.10.71\033[0m"
     
 fi
 if [ -z $7 ]
 then
-    echo -e "[\033[32mfarmer-hoe\033[0m] \033[31m找不到参数6:Commit Worker的节点，example:192.168.14.63,192.168.14.64\033[0m"
+    echo -e "[\033[32mfarmer-hoe\033[0m] \033[31m找不到参数6:Commit Worker的节点，example:25.10.10.72,25.10.10.71\033[0m"
 fi
 if [ $# -eq 7 ] 
 then
@@ -165,7 +167,7 @@ then
     LOTUS_PATH_WORKER_2K=$5
     PrecommitHost=$6
     CommitHost=$7
-    localIp=$(ifconfig|grep 'inet 192.168'|awk '{print $2}')
+    localIp=$(ifconfig|grep 'inet 25.10'|awk '{print $2}')
     workerDir=$(pwd)
     cd $LOTUS_SOURCE_2K 
     clean2K
