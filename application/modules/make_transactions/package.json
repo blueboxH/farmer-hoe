@@ -1,0 +1,22 @@
+{
+  "name": "make_transactions",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^7.1.1",
+    "chalk": "^4.1.0",
+    "glob": "^7.1.6",
+    "jssm": "^5.32.20",
+    "lockfile": "^1.0.4",
+    "mocha": "^8.2.1",
+    "shortid": "^2.2.16",
+    "split-file": "^2.2.1"
+  }
+}

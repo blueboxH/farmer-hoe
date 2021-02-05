@@ -1,0 +1,1 @@
+select t.id,t.file_name,t.file_path,t.file_size,f.file_format from temp_file_index as t left join file_index as f on t.file_id = f.id where f.slice > 0 UNION select id,file_name,file_path,file_size,file_format from file_index where slice = 0

@@ -1,0 +1,23 @@
+{
+    "target": "/root/Project-FC/test-data",
+    "file_part_size": 52428800,
+    "file_split": true,
+    "miners": [
+        {
+            "miner_id": "t02662",
+            "price": "0.00000000005"
+        },
+        {
+            "miner_id": "t02179",
+            "price": "0.00000000005"
+        },
+        {
+            "miner_id": "t04399",
+            "price": "0.0000004"
+        }
+    ],
+    "application_address": "t3v5xezi2auxjabbzegvs6o37kjirdeuykowcvwuj6kiccff2a7dhdwsyg7aevef4azzl2i76q36uvbxwtgkaq",
+    "log_level":"warning",
+    "work_frequency":10000,
+    "parallel_tasks":4
+}
