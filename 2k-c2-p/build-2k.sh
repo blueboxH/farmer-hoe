@@ -45,8 +45,6 @@ build2K()
     fi
     echo "export CURRENT_MINER_STORAGE_PATH=$CURRENT_MINER_STORAGE_PATH" >> ~/.bashrc
 
-    make 2k &&
-
     export LOTUS_SKIP_GENESIS_CHECK=_yes_
 
     ./lotus-seed --sector-dir $LOTUS_PATH_2K/genesis-sectors pre-seal --sector-size 2KiB --num-sectors 2

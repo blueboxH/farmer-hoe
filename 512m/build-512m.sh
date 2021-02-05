@@ -52,7 +52,11 @@ build2K()
     fi
     echo "export FULLNODE_API_INFO=$FULLNODE_API_INFO" >> ~/.bashrc
 
+<<<<<<< HEAD
 #    env RUSTFLAGS="-C target-cpu=native -g" FIL_PROOFS_USE_GPU_COLUMN_BUILDER=1 FIL_PROOFS_USE_GPU_TREE_BUILDER=1 FFI_BUILD_FROM_SOURCE=1 make clean all  &&
+=======
+    # env RUSTFLAGS="-C target-cpu=native -g" FIL_PROOFS_USE_GPU_COLUMN_BUILDER=1 FIL_PROOFS_USE_GPU_TREE_BUILDER=1 FFI_BUILD_FROM_SOURCE=1 make clean all 
+>>>>>>> 3ef0bd9101d95bcea0a2b66235b3e072bebc2532
 
 #    export LOTUS_SKIP_GENESIS_CHECK=_yes_
 
@@ -73,12 +77,21 @@ build2K()
 #    done
 
     ./lotus-miner init --sector-size=512MiB --owner=$(./lotus wallet default)
+<<<<<<< HEAD
     sed -i -e "/127.0.0.1/s/^#\s*//;s/127.0.0.1/${localIp}/" \
         -e '/AllowPreCommit1/s/^#\s*//;/AllowPreCommit1/s/true/false/' \
         -e '/AllowPreCommit2/s/^#\s*//;/AllowPreCommit2/s/true/false/' \
         -e '/AllowCommit/s/^#\s*//;/AllowCommit/s/true/false/' \
         -e '/AllowUnseal/s/^#\s*//;/AllowUnseal/s/true/false/' ${LOTUS_PATH_2K}/lotusminer/config.toml 
     nohup ./lotus-miner run >> $LOTUS_PATH_2K/miner.log 2>&1 &
+=======
+    #sed -i -e "/127.0.0.1/s/^#\s*//;s/127.0.0.1/${localIp}/" \
+    #    -e '/AllowPreCommit1/s/^#\s*//;/AllowPreCommit1/s/true/false/' \
+    #   -e '/AllowPreCommit2/s/^#\s*//;/AllowPreCommit2/s/true/false/' \
+     #  -e '/AllowCommit/s/^#\s*//;/AllowCommit/s/true/false/' \
+      # -e '/AllowUnseal/s/^#\s*//;/AllowUnseal/s/true/false/' ${LOTUS_PATH_2K}/lotusminer/config.toml 
+   nohup ./lotus-miner run >> $LOTUS_PATH_2K/miner.log 2>&1 &
+>>>>>>> 3ef0bd9101d95bcea0a2b66235b3e072bebc2532
 
     ./lotus-miner log set-level --system storageminer error
 
